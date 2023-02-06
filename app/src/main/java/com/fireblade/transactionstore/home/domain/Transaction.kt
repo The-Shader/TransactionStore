@@ -1,7 +1,7 @@
 package com.fireblade.transactionstore.home.domain
 
 data class Transaction(
-    val store: MutableMap<String, String>,
-    var nestedTx: Transaction? = null,
-    var parentTx: Transaction? = null
+    val store: Map<String, String>,
+    val nestedTx: Transaction? = null,
+    val parentTx: Transaction? = null
 )

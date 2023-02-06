@@ -4,7 +4,7 @@ import arrow.core.Either
 
 class TransactionStoreImpl : TransactionStoreService {
     private var currentTx = Transaction(
-        store = mutableMapOf()
+        store = mapOf()
     )
 
     override fun processTransactionRequest(request: TransactionRequest): Either<TransactionError, Unit> {
@@ -35,14 +35,15 @@ class TransactionStoreImpl : TransactionStoreService {
     private fun insertNewTransaction(): Either<TransactionError, Unit> {
         return Either.catch(
             f = {
-                currentTx.nestedTx = Transaction(
-                    store = mutableMapOf(),
+                val nestedTx = Transaction(
+                    store = currentTx.store,
                     parentTx = currentTx
                 )
-                currentTx = currentTx.nestedTx!!
-                currentTx.parentTx?.store?.let { environment ->
-                    currentTx.store.putAll(environment)
-                }
+                currentTx = nestedTx.copy(
+                    parentTx = nestedTx.parentTx?.copy(
+                        nestedTx = nestedTx
+                    )
+                )
             },
             fe = {
                 TransactionError.BEGIN
@@ -97,7 +98,9 @@ class TransactionStoreImpl : TransactionStoreService {
     private fun setValue(key: String, value: String): Either<PropertyError, PropertyResponse> {
         return Either.catch(
             f = {
-                currentTx.store[key] = value
+                currentTx = currentTx.copy(
+                    store = currentTx.store.plus(key to value)
+                )
                 PropertyResponse.Empty
             },
             fe = {
@@ -123,7 +126,9 @@ class TransactionStoreImpl : TransactionStoreService {
     private fun delete(key: String): Either<PropertyError, PropertyResponse> {
         return Either.catch(
             f = {
-                currentTx.store.remove(key)
+                currentTx = currentTx.copy(
+                    store = currentTx.store.minus(key)
+                )
                 PropertyResponse.Empty
             },
             fe = {
@@ -132,9 +137,10 @@ class TransactionStoreImpl : TransactionStoreService {
         )
     }
 
-    fun printStore() {
+    override fun printStore() {
         currentTx.store.map {
             print("${it.key} - ${it.value} ; ")
         }
+        println()
     }
 }
