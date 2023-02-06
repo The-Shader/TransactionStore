@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">TransactionStore</string>
+    <string name="error_invalid_request">Unsupported request</string>
+    <string name="error_general">Failed to process request</string>
+    <string name="error_get_value">Key not set</string>
+    <string name="error_delete_value">Key not set</string>
+    <string name="error_commit">No transaction to commit</string>
+    <string name="error_rollback">No transaction to rollback</string>
+    <string name="result">Result: %1$s</string>
+    <string name="submit_cta">Submit</string>
+    <string name="enter_label">Enter command:</string>
+</resources>
